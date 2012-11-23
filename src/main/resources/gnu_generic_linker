@@ -1,0 +1,4 @@
+#!/bin/bash
+MIND_LIBS=$(find $MIND_ROOT/lib/ -name "*.jar" | tr "\n" ":")
+
+java -cp $MIND_LIBS org.ow2.mind.ctools.gnu.GnuLinkerExecutorLauncher $@
