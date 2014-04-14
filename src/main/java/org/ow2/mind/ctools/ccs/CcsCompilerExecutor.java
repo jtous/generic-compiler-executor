@@ -4,15 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ow2.mind.cli.CommandLine;
+import org.ow2.mind.ctools.AssemblerExecutorLauncher;
 import org.ow2.mind.ctools.CompilerExecutor;
 import org.ow2.mind.ctools.CompilerExecutorLauncher;
 
 public class CcsCompilerExecutor extends org.ow2.mind.ctools.AbstractExecutor implements CompilerExecutor {
+	public String COMMAND;
+	public CcsCompilerExecutor(String cmd) {
+		COMMAND = cmd;
+	}
 	public void preprocess(CommandLine cmdLine) {
 		if (CompilerExecutorLauncher.dependencyFileOpt.getValue(cmdLine)!=null) {
 			List<String> cmdDependency = new ArrayList<String>();
 			if (CompilerExecutorLauncher.executableOpt.getValue(cmdLine)==null) {
-				cmdDependency.add("cl470");
+				cmdDependency.add(COMMAND);
 			} else {
 				cmdDependency.add(CompilerExecutorLauncher.executableOpt.getValue(cmdLine));
 			}
@@ -48,11 +53,11 @@ public class CcsCompilerExecutor extends org.ow2.mind.ctools.AbstractExecutor im
 		
 		List<String> cmdPreprocess = new ArrayList<String>();
 		if (CompilerExecutorLauncher.executableOpt.getValue(cmdLine)==null) {
-			cmdPreprocess.add("cl470");
+			cmdPreprocess.add(COMMAND);
 		} else {
 			cmdPreprocess.add(CompilerExecutorLauncher.executableOpt.getValue(cmdLine));
 		}
-		cmdPreprocess.add(CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine));
+		cmdPreprocess.add("-fc=" + CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine));
 		if (CompilerExecutorLauncher.flagsOpt.getValue(cmdLine)!=null) {
 			for (String f : CompilerExecutorLauncher.flagsOpt.getValue(cmdLine).split(" ")){
 				cmdPreprocess.add(f);
@@ -78,18 +83,21 @@ public class CcsCompilerExecutor extends org.ow2.mind.ctools.AbstractExecutor im
 		cmdPreprocess.add("-ppl");
 		cmdPreprocess.add("--output_file="+CompilerExecutorLauncher.outputFileOpt.getValue(cmdLine));
 		String[] strs = (String[]) cmdPreprocess.toArray(new String[cmdPreprocess.size()]);
+		for (String str : strs) System.out.print(str + " ");
+		System.out.println();
+
 		System.exit(exec(strs));
 	}
 
 	public void compile(CommandLine cmdLine) {
 		List<String> cmd = new ArrayList<String>();
 		if (CompilerExecutorLauncher.executableOpt.getValue(cmdLine)==null) {
-			cmd.add("cl470");
+			cmd.add(COMMAND);
 		} else {
 			cmd.add(CompilerExecutorLauncher.executableOpt.getValue(cmdLine));
 		}
 		cmd.add("-c");
-		cmd.add(CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine));
+		cmd.add("-fc="+CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine));
 		if (CompilerExecutorLauncher.flagsOpt.getValue(cmdLine)!=null) {
 			for (String f : CompilerExecutorLauncher.flagsOpt.getValue(cmdLine).split(" ")){
 				cmd.add(f);
@@ -118,5 +126,6 @@ public class CcsCompilerExecutor extends org.ow2.mind.ctools.AbstractExecutor im
 		cmd.add("--output_file="+CompilerExecutorLauncher.outputFileOpt.getValue(cmdLine));
 		String[] strs = (String[]) cmd.toArray(new String[cmd.size()]);
 		System.exit(exec(strs));	
+
 	}
 }

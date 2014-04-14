@@ -96,6 +96,7 @@ public class AssemblerExecutorLauncher {
 			printMissingInputFileHelp(System.out);
 			System.exit(-1);	
 		}
+		executor.assemble(cmdLine);
 	}
 
 	private static void printMissingInputFileHelp(PrintStream ps) {

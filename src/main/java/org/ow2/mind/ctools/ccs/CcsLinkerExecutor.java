@@ -8,10 +8,14 @@ import org.ow2.mind.ctools.LinkerExecutor;
 import org.ow2.mind.ctools.LinkerExecutorLauncher;
 
 public class CcsLinkerExecutor extends org.ow2.mind.ctools.AbstractExecutor implements LinkerExecutor {
+	public String COMMAND;
+	public CcsLinkerExecutor(String cmd) {
+		COMMAND = cmd;
+	}
 	public void link(CommandLine cmdLine) {
 		List<String> cmd = new ArrayList<String>();
 		if (LinkerExecutorLauncher.executableOpt.getValue(cmdLine)==null) {
-			cmd.add("lnk470");
+			cmd.add(COMMAND);
 		} else {
 			cmd.add(LinkerExecutorLauncher.executableOpt.getValue(cmdLine));
 		}
@@ -32,6 +36,6 @@ public class CcsLinkerExecutor extends org.ow2.mind.ctools.AbstractExecutor impl
 		String[] strs = (String[]) cmd.toArray(new String[0]);
 		for (String s : strs)
 			System.out.print(s + " ");
-		exec(strs);	
+		System.exit(exec(strs));	
 	}
 }
