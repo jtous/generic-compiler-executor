@@ -52,48 +52,59 @@ public class GmakeCompilerExecutor extends org.ow2.mind.ctools.AbstractExecutor 
 	}
 
 	public void compile(CommandLine cmdLine) {
-		String target=CompilerExecutorLauncher.outputFileOpt.getValue(cmdLine);
-		String dependencies="";
-		String source=CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine);
-		String compiler="$(CC)";
-		if (CompilerExecutorLauncher.executableOpt.getValue(cmdLine)!=null) {
-			compiler = CompilerExecutorLauncher.executableOpt.getValue(cmdLine);
-		}
-		String cflags="";
-		if (CompilerExecutorLauncher.flagsOpt.getValue(cmdLine)!=null)
-			cflags=CompilerExecutorLauncher.flagsOpt.getValue(cmdLine);
-		if (CompilerExecutorLauncher.defineOpt.getValue(cmdLine)!=null) {
-			for (String def : CompilerExecutorLauncher.defineOpt.getValue(cmdLine).split(" ")) {
-				cflags = cflags + " -D" + def + " ";
-			}
-		}
-		if (CompilerExecutorLauncher.includeDirOpt.getValue(cmdLine)!=null) {
-			for (String dir : CompilerExecutorLauncher.includeDirOpt.getValue(cmdLine).split(" ") ){
-				cflags = cflags + " -I" + dir + " ";
-			}
-		}
-		if (CompilerExecutorLauncher.preIncludeFileOpt.getValue(cmdLine)!=null) {
-			for (String inc : CompilerExecutorLauncher.preIncludeFileOpt.getValue(cmdLine).split(" ") ){
-				cflags = cflags + " --include " + inc + " ";
-				dependencies = dependencies + " " + inc;
-			}
-		}
-		BufferedWriter output;
 		try {
-		output = new BufferedWriter(new FileWriter("tmp.make",true));
-		output.append(target + " : " + source + dependencies);
-		output.newLine();
-		output.append("\t" + compiler + " -c " + source + " -o $@ " + cflags);
-		output.newLine();
-		output.newLine();
-		output.close();
-//		System.out.println("#makefile#" + target + " : " + source + dependencies);
-//		System.out.println("#makefile#\t" + compiler + " -c " + source + " -o $@ " + cflags);
-//		System.out.println();
+			String target=CompilerExecutorLauncher.outputFileOpt.getValue(cmdLine);
+			String dependencies=CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine) + " ";
+			String source=CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine) + ".concatenated.c";
+
+			BufferedWriter concatenated = new BufferedWriter(new FileWriter(source));
+
+			String compiler="$(CC)";
+			if (CompilerExecutorLauncher.executableOpt.getValue(cmdLine)!=null) {
+				compiler = CompilerExecutorLauncher.executableOpt.getValue(cmdLine);
+			}
+			String cflags="";
+			if (CompilerExecutorLauncher.flagsOpt.getValue(cmdLine)!=null)
+				cflags=CompilerExecutorLauncher.flagsOpt.getValue(cmdLine);
+			if (CompilerExecutorLauncher.defineOpt.getValue(cmdLine)!=null) {
+				for (String def : CompilerExecutorLauncher.defineOpt.getValue(cmdLine).split(" ")) {
+					cflags = cflags + " -D" + def + " ";
+				}
+			}
+			if (CompilerExecutorLauncher.includeDirOpt.getValue(cmdLine)!=null) {
+				for (String dir : CompilerExecutorLauncher.includeDirOpt.getValue(cmdLine).split(" ") ){
+					cflags = cflags + " -I" + dir + " ";
+				}
+			}
+			cflags = cflags + "-I. ";
+			if (CompilerExecutorLauncher.preIncludeFileOpt.getValue(cmdLine)!=null) {
+				for (String inc : CompilerExecutorLauncher.preIncludeFileOpt.getValue(cmdLine).split(" ") ){
+					//cflags = cflags + " --include " + inc + " ";			
+					concatenated.append("#include \"" + inc +"\"");
+					concatenated.newLine();
+					dependencies = dependencies + " " + inc;
+				}
+			}
+			concatenated.append("#include \"" + CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine) +"\"");
+			concatenated.newLine();
+			concatenated.newLine();
+			concatenated.close();
+			
+			BufferedWriter makefile = new BufferedWriter(new FileWriter("tmp.make",true));
+			makefile.append(target + " : " + source + " " + dependencies);
+			makefile.newLine();
+			makefile.append("\t" + compiler + " -c " + source + " -o $@ " + cflags);
+			makefile.newLine();
+			makefile.newLine();
+			makefile.close();
+			//		System.out.println("#makefile#" + target + " : " + source + dependencies);
+			//		System.out.println("#makefile#\t" + compiler + " -c " + source + " -o $@ " + cflags);
+			//		System.out.println();
+
+			System.exit(0);	
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.exit(0);	
 	}
 }
