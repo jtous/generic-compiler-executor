@@ -80,12 +80,12 @@ public class GmakeCompilerExecutor extends org.ow2.mind.ctools.AbstractExecutor 
 			if (CompilerExecutorLauncher.preIncludeFileOpt.getValue(cmdLine)!=null) {
 				for (String inc : CompilerExecutorLauncher.preIncludeFileOpt.getValue(cmdLine).split(" ") ){
 					//cflags = cflags + " --include " + inc + " ";			
-					concatenated.append("#include \"" + inc +"\"");
+					concatenated.append("#include \"" + inc.replace("\\", "/") +"\"");
 					concatenated.newLine();
 					dependencies = dependencies + " " + inc;
 				}
 			}
-			concatenated.append("#include \"" + CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine) +"\"");
+			concatenated.append("#include \"" + CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine).replace("\\", "/") +"\"");
 			concatenated.newLine();
 			concatenated.newLine();
 			concatenated.close();

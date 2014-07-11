@@ -19,11 +19,11 @@ public class GmakeCopyCompilerExecutor extends org.ow2.mind.ctools.gmake.GmakeCo
 
 			if (CompilerExecutorLauncher.preIncludeFileOpt.getValue(cmdLine)!=null) {
 				for (String inc : CompilerExecutorLauncher.preIncludeFileOpt.getValue(cmdLine).split(" ") ){
-					concatenated.append("#include \"" + inc +"\"");
+					concatenated.append("#include \"" + inc.replace("\\", "/") +"\"");
 					concatenated.newLine();
 				}
 			}
-			concatenated.append("# 1 \"" + CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine) + "\"");
+			concatenated.append("# 1 \"" + CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine).replace("\\", "/") + "\"");
 			concatenated.newLine();
 			
 		     BufferedInputStream bin = new BufferedInputStream(new FileInputStream(CompilerExecutorLauncher.inputFileOpt.getValue(cmdLine)));
